@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Meu Facebook Login</title>
+<meta charset="UTF-8">
+</head>
+<body>
+<script>
+  
+  //INICIALIZAÇÃO DO APLICATIVO NA PÁGINA, EXECUTADO APÓS A INCLUSÃO DO SDK
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '{ID-DO-APLICATIVO}',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v2.6'
+    });
+
+    //PRIMEIRA FUNÇÃO A SER CHAMADA, PARA VERIFICAR O SE O USUÁRIO ESTÁ LOGADO NO FACEBOK
+    //ESTA FUNÇÃO FOI COLOCADA DENTRO DE "window.fbAsyncInit" PARA QUE SE POSSA CHAMAR A VARIAVEL
+    //"FB" COM CERTEZA QUE A APLICAÇÃO JÁ FOI INICIADA
+    FB.getLoginStatus(function(response) {
+      verificaStatusUsuario(response);
+    });
+
+  };
+  
+  //TRECHO PARA CARREGAMENTO DO SDK DE FORMA ASSÍNCRONA, ATRAVÉS DA CHAMADA DE UMA FUNÇÃO ANÔNIMA
+  //APÓS A INCLUSÃO DO SDK NA PÁGINA, O TRECHO ANTERIOR É EXECUTADO PELO SDK AUTOMATICAMENTE
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/pt_BR/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+
+  //FUNÇÃO QUE VERIFICA SE O USUÁRIO ESTÁ LOGADO NO FACEBOOK
+  //SE ELE ESTIVER LOGADO, VERIFICA SE COMPARTILHA PERMISSÕES COM O NOSSO APP
+  //SE ESTIVER LOGADO, E COMPARTILHANDO INFORMAÇÕES, A FUNÇÃO "testAPI" É CHAMADA
+  function verificaStatusUsuario(response) {
+      if (response.status === 'connected') {
+        testAPI();
+      } else if (response.status === 'not_authorized') {
+        document.getElementById('status').innerHTML = 'Faça o login no Aplicativo.';
+      } else {
+        document.getElementById('status').innerHTML = 'Faça o Login no Facebook.';
+      }
+  }
+
+  //FUNÇÃO UTILIZADA NO BOTÃO LOGIN, É DISPARADA APÓS A EXECUÇÃO DO LOGIN
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      verificaStatusUsuario(response);
+    })
+  }
+
+  //FUNÇAO UTILIZADA PARA DEMONSTRAR COMO OBTER INFORMAÇÕES DO USUÁRIO, BEM COMO PARA EXERCITAR
+  //O CASO DE LOGIN EFETUADO COM SUCESSO E O COMPARTILHAMENTO DE INFORMAÇÕES
+  function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status').innerHTML ='Bem vindo, ' + response.name + '!';
+    });
+  }
+</script>
+
+  <!-- Botão login, que requisita ao usuário seu perfil públic, email e lista de amigos,
+  também foi incluído a opção de "logout" caso já este logado no face "data-auto-logout-link",
+  bem como a listagem de amigos que também utilizam o APP  "data-show-faces"-->
+  <fb:login-button scope="public_profile,email,user_friends" onlogin="checkLoginState();"
+    data-auto-logout-link="true" data-show-faces="true">
+  </fb:login-button>
+
+  <!-- tag onde é descrito o status do úsuário, utilizada na função "verificaStatusUsuario"-->
+  <div id="status"></div>
+
+</body>
+</html>
